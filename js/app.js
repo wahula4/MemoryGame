@@ -10,21 +10,54 @@
 // select each card in the deck and add classes after being clicked
 let inputs = document.querySelectorAll('li');
 let cardArray = [];
+let moves = 0;
+let counter = 0;
+
+//function hasClass(element, cls) {
+ //   return element.className.includes(cls);
+//}
+
+
+
 
 inputs.forEach(function(input) {
   input.addEventListener('click', function click() {
     input.classList.add("open", "show")
-    //makeArray();
-    console.log(input.childNodes[1].classList.value.toString());
-    // trying to add the class name of i tags for each li
-    cardArray.push(input.childNodes[1].classList.value);
-    console.log(cardArray);
+    // adding the value of each <i> tag to the array for comparison
+    cardArray.push(input.childNodes[1].classList[1]);
+    //console.log(input.childNodes[1].classList[1]);
+
+    if(cardArray.length === 2) {
+        if(cardArray[0] === cardArray[1]){
+            console.log("correct");
+            moves++;
+            counter++;
+            
+            //input.classList.add("match");
+            //input.classList.remove("show");
+            cardArray.splice(0, cardArray.length);
+            if(counter === 6){
+                console.log("winner");
+                setTimeout(function(){ init() }, 1000);
+            }
+        }
+        else {
+            moves++;
+            setTimeout(function(){ 
+                input.classList.remove("open", "show")
+             }, 1000);
+             //console.log("cardarray0:" + cardArray[0]);
+             var el = document.getElementsByClassName(cardArray[0])[0];
+                setTimeout(function(){ 
+                    console.log(el.parentNode.classList.remove('open', 'show'));
+                    //el.classList.remove("open", "show")
+                 }, 1000);
+            cardArray.splice(0, cardArray.length);
+            //console.log("wrong");
+        }
+    }
   });
 });
-
-//function makeArray() {
-    
-//}
 
 // create an array of items with the class 'card', then run the shuffle function 
 // after the array is shuffled append the items back to the deck
