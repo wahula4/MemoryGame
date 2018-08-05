@@ -10,50 +10,65 @@
 // select each card in the deck and add classes after being clicked
 let inputs = document.querySelectorAll('li');
 let cardArray = [];
-let moves = 0;
+let moveStart = 0;
 let counter = 0;
 
-//function hasClass(element, cls) {
- //   return element.className.includes(cls);
-//}
+// update number of moves made 
+// FIXME - doesn't update
+let moves = document.querySelector(".moves");
+moves.textContent = moveStart;
 
-
-
+// restart game
+document.querySelector(".restart").addEventListener("click", restart);
+function restart(){
+    init();
+}
 
 inputs.forEach(function(input) {
   input.addEventListener('click', function click() {
     input.classList.add("open", "show")
     // adding the value of each <i> tag to the array for comparison
     cardArray.push(input.childNodes[1].classList[1]);
-    //console.log(input.childNodes[1].classList[1]);
 
     if(cardArray.length === 2) {
         if(cardArray[0] === cardArray[1]){
             console.log("correct");
-            moves++;
+            moveStart++;
             counter++;
-            
-            //input.classList.add("match");
-            //input.classList.remove("show");
+            // add logic to change the first clicked match to have match css
+            setTimeout(function(){
+                input.classList.add("match");
+                input.classList.remove("show");
+            }, 1000);
+            let correctGuessOne = document.getElementsByClassName(cardArray[0])[0];
+            setTimeout(function(){ 
+                // remove classes from parent to flip card back to being hidden
+                correctGuessOne.parentNode.classList.remove("show");
+                correctGuessOne.parentNode.classList.add("match");
+            }, 1000);
             cardArray.splice(0, cardArray.length);
+            // after 6 matches have been made the game is over
             if(counter === 6){
                 console.log("winner");
                 setTimeout(function(){ init() }, 1000);
             }
         }
         else {
-            moves++;
+            moveStart++;
             setTimeout(function(){ 
                 input.classList.remove("open", "show")
              }, 1000);
-             //console.log("cardarray0:" + cardArray[0]);
-             var el = document.getElementsByClassName(cardArray[0])[0];
-                setTimeout(function(){ 
-                    console.log(el.parentNode.classList.remove('open', 'show'));
-                    //el.classList.remove("open", "show")
-                 }, 1000);
+             // find the element with the class name corresonding to the previously clicked card
+            let wrongGuessOne = document.getElementsByClassName(cardArray[0])[0];
+            setTimeout(function(){ 
+                // remove classes from parent to flip card back to being hidden
+                wrongGuessOne.parentNode.classList.remove("open", "show");
+            }, 1000);
+            // empty array for next attempt
             cardArray.splice(0, cardArray.length);
-            //console.log("wrong");
+            console.log("card array: " + cardArray);
+            console.log("moves: " + moveStart);
+            console.log("match counter: " + counter)
         }
     }
   });
@@ -64,11 +79,15 @@ inputs.forEach(function(input) {
 function init() {    
     const deck = document.querySelector('ul');
     let card = document.getElementsByClassName('card');
+    //let cardClasses = document.getElementsByTagName('li');
+    //cardClasses.classList.remove("open", "show", "match");
     let cards = [...card]
       shuffle(cards);                   
   for ( var item of cards) { 
-   deck.appendChild(item);    
+   deck.appendChild(item);
+   item.classList.remove("open", "show", "match");    
     }     
+    moveStart = 0;
 } 
 init();
 
