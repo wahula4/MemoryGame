@@ -1,29 +1,15 @@
-/*
- * Create a list that holds all of your cards
- */
-/*
- * Display the cards on the page
- *   - shuffle the list of cards using the provided "shuffle" method below
- *   - loop through each card and create its HTML
- *   - add each card's HTML to the page
- */
 // select each card in the deck and add classes after being clicked
 let inputs = document.querySelectorAll('li');
 let cardArray = [];
 let moveStart = 0;
-let counter = 0;
+let counter = 7; // counter starts at 7 for testing
 
 // update number of moves made 
 // FIXME - doesn't update
 let moves = document.querySelector(".moves");
-moves.textContent = moveStart;
+moves.innerText = moveStart;
 
-// restart game
-document.querySelector(".restart").addEventListener("click", restart);
-function restart(){
-    init();
-}
-
+// FIXME - incorrect card doesn't always flip back over
 inputs.forEach(function(input) {
   input.addEventListener('click', function click() {
     input.classList.add("open", "show")
@@ -48,9 +34,10 @@ inputs.forEach(function(input) {
             }, 1000);
             cardArray.splice(0, cardArray.length);
             // after 6 matches have been made the game is over
-            if(counter === 6){
+            if(counter === 8){
                 console.log("winner");
-                setTimeout(function(){ init() }, 1000);
+                finish();
+                setTimeout(function(){ modalOpen() }, 1000);
             }
         }
         else {
@@ -102,18 +89,45 @@ function shuffle(array) {
         array[currentIndex] = array[randomIndex];
         array[randomIndex] = temporaryValue;
     }
-
     return array;
 }
 
+// FIX-ME message
+function finish(){
+    const modelMoves = document.getElementById('modalMoves');
+    modelMoves.innerText = moves.textContent;
+    let message = document.getElementById('modalMessage')
+    if (moveStart === 8)
+        message.innerHTML = "Perfect Score!";
+    else if (moveStart > 8 && moveStart < 15)
+        message.innerHTML = "Great Job!";
+    else if (moveStart >= 15)
+        message.innerHTML = "Well Done, try again for a better score"; 
+}
 
-/*
- * set up the event listener for a card. If a card is clicked:
- *  - display the card's symbol (put this functionality in another function that you call from this one)
- *  - add the card to a *list* of "open" cards (put this functionality in another function that you call from this one)
- *  - if the list already has another card, check to see if the two cards match
- *    + if the cards do match, lock the cards in the open position (put this functionality in another function that you call from this one)
- *    + if the cards do not match, remove the cards from the list and hide the card's symbol (put this functionality in another function that you call from this one)
- *    + increment the move counter and display it on the page (put this functionality in another function that you call from this one)
- *    + if all cards have matched, display a message with the final score (put this functionality in another function that you call from this one)
- */
+// restart game
+document.querySelector(".restart").addEventListener("click", restart);
+document.querySelector(".btn").addEventListener("click", restart);
+
+function restart(){
+    modal.style.display = "none";
+    moveStart.innerText = 0;
+    init();
+}
+
+let modal = document.querySelector('.modal');
+// modal
+function modalOpen(){
+modal.style.display= "block";
+ // get the close button and remove modal on click
+  let close = document.querySelector(".close");
+  close.onclick = function() {
+      modal.style.display = "none";
+  };
+  // When the user clicks outside of the modal, close it
+  window.onclick = function(event) {
+      if (event.target == modal) {
+          modal.style.display = "none";
+      }
+    }
+}
