@@ -11,8 +11,10 @@ const init = () => {
     shuffle(cards); 
     for (var i = 0; i < cards.length; i++) {
         deck.append($('<li class="card"><i class="fa fa-' + cards[i] + '"></i></li>'))
-        //console.log(cards[i]);
+        console.log(cards[i]);
         moves = 0;
+        matches = 7;
+        flippedCards = [];
         score.html(moves);
     }
 }
@@ -34,7 +36,7 @@ function shuffle(array) {
 }
 
 // if a card is clicked, find the class name of it's icon and push to array
-$(".card").click(function () {
+$(document).on("click", ".card", function () {
     $(this).toggleClass("open show");
     let iconName = $(this).find("i").attr("class")
     flippedCards.push(iconName);
@@ -46,19 +48,27 @@ $(".card").click(function () {
             setTimeout(function () {
                 deck.find(".open").toggleClass("match");
             }, wait)
+            deck.find(".open").toggleClass("animated flash");
             matches++;
         } else {
             setTimeout(function () {
                 deck.find(".open").toggleClass("open show");
+                console.log("delay wrong");
             }, wait)
+            deck.find(".open").toggleClass("animated wobble");
+            console.log("wrong");
         }
+        // empty the array and remove animation to allow for next move
         flippedCards = [];
+        setTimeout(function(){
+            deck.find(".wobble").removeClass("animated wobble");
+        }, wait);
+        
         
         //increment moves after each turn and add to DOM
         moves++;
         score.html(moves);
     }
-
     numMatches();
 });
 
@@ -67,6 +77,21 @@ const numMatches = () => {
     if (matches === cards.length / 2) {
         setTimeout(function(){
             console.log("win");
+            modalOpen();
         }, wait)
+    }
+}
+
+$(".restart").click(function(){
+    init();
+});
+
+// modal
+function modalOpen(){
+    $("#myModal").modal("toggle");
+    let message = `<p>You completed the game in ${moves} moves!</p>`;
+    let star = "<i class='fa fa-star'></i>"
+    if(moves > 2){
+        $(".modal-body").append(message + star);
     }
 }
