@@ -1,19 +1,19 @@
 const cards = ['cube', 'cube', 'bicycle', 'bicycle', 'leaf', 'leaf', 'diamond', 'diamond', 'anchor', 'anchor', 'paper-plane-o', 'paper-plane-o', 'bolt', 'bolt', 'bomb', 'bomb']
 let flippedCards = [];
 let deck = $('.deck');
-const wait = 1500;
-let matches = 7;
+let matches;
 let moves = 0;
 let score = $(".moves")
+const wait = 1250;
 
+// run init to start the game by appending each card randomly to the deck
 const init = () => {
     deck.empty();
     shuffle(cards); 
     for (var i = 0; i < cards.length; i++) {
         deck.append($('<li class="card"><i class="fa fa-' + cards[i] + '"></i></li>'))
-        console.log(cards[i]);
         moves = 0;
-        matches = 7;
+        matches = 0;
         flippedCards = [];
         score.html(moves);
     }
@@ -36,35 +36,30 @@ function shuffle(array) {
 }
 
 // if a card is clicked, find the class name of it's icon and push to array
+// .show is given only to cards when they are open to be given the animations
 $(document).on("click", ".card", function () {
     $(this).toggleClass("open show");
     let iconName = $(this).find("i").attr("class")
     flippedCards.push(iconName);
-    console.log(flippedCards);
-
     //check array length and determine if there's a match
     if (flippedCards.length === 2) {
-        if (iconName === flippedCards[0]) {
+        if (flippedCards[0] === flippedCards[1]) {
             setTimeout(function () {
-                deck.find(".open").toggleClass("match");
+                deck.find(".show").toggleClass("match show");
             }, wait)
-            deck.find(".open").toggleClass("animated flash");
+            deck.find(".show").toggleClass("animated flash");
             matches++;
         } else {
             setTimeout(function () {
-                deck.find(".open").toggleClass("open show");
-                console.log("delay wrong");
+                deck.find(".show").toggleClass("open show");
             }, wait)
-            deck.find(".open").toggleClass("animated wobble");
-            console.log("wrong");
+            deck.find(".show").toggleClass("red animated wobble");
         }
         // empty the array and remove animation to allow for next move
         flippedCards = [];
-        setTimeout(function(){
-            deck.find(".wobble").removeClass("animated wobble");
+        setTimeout(function () {
+            deck.find(".wobble").removeClass("animated wobble red");
         }, wait);
-        
-        
         //increment moves after each turn and add to DOM
         moves++;
         score.html(moves);
@@ -72,26 +67,30 @@ $(document).on("click", ".card", function () {
     numMatches();
 });
 
-// if all matches have been made the game is over
+// if num of matches is equal to half num of cards - open modal
 const numMatches = () => {
     if (matches === cards.length / 2) {
-        setTimeout(function(){
-            console.log("win");
+        setTimeout(function () {
             modalOpen();
         }, wait)
     }
 }
 
-$(".restart").click(function(){
+// if player clicks restart, start game over
+$(".restart").click(function () {
     init();
 });
 
-// modal
-function modalOpen(){
+// modal opens when game is finished - stars given based on number of moves.
+const modalOpen = () => {
     $("#myModal").modal("toggle");
     let message = `<p>You completed the game in ${moves} moves!</p>`;
     let star = "<i class='fa fa-star'></i>"
-    if(moves > 2){
-        $(".modal-body").append(message + star);
-    }
+    let starEmpty = "<i class='fa fa-star-o'></i>"
+    if (moves < 15)
+        $(".modal-body").append(`${message} ${star}${star}${star}`);
+    else if (moves < 20)
+        $(".modal-body").append(`${message} ${star}${star}${starEmpty}`);
+    else
+        $(".modal-body").append(`${message} ${star}${starEmpty}${starEmpty}`);
 }
